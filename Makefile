@@ -1,4 +1,4 @@
-all: coq extraction_plugin extraction_ocaml_ffi plugin bootstrap
+all: coq #extraction_plugin extraction_ocaml_ffi plugin bootstrap
 
 extraction_ocaml_ffi:
 	cd lib/coq_verified_extraction_ocaml_ffi && dune build
@@ -12,14 +12,14 @@ coq: Makefile.coq
 html: Makefile.coq
 	+make -f Makefile.coq html
 
-install: install-coq plugin
+install: install-coq #plugin
 
 install-coq: Makefile.coq coq
 	+make -f Makefile.coq install
-	cd lib/coq_verified_extraction_ocaml_ffi && dune install
-	cd lib/coq_verified_extraction_plugin && dune install
-	cd plugin/plugin && make -f Makefile.coq install
-	cd plugin/plugin-bootstrap && make -f Makefile.coq install
+	#cd lib/coq_verified_extraction_ocaml_ffi && dune install
+	#cd lib/coq_verified_extraction_plugin && dune install
+	#cd plugin/plugin && make -f Makefile.coq install
+	#cd plugin/plugin-bootstrap && make -f Makefile.coq install
 
 clean: Makefile.coq plugin/plugin/Makefile.coq plugin/plugin-bootstrap/Makefile.coq
 	+make -f Makefile.coq clean
@@ -37,8 +37,8 @@ plugin: coq plugin/plugin/Makefile.coq extraction_plugin extraction_ocaml_ffi
 	cd plugin/plugin && ./clean_extraction.sh
 	+make -C plugin/plugin
 
-test: 
-	cd plugin/tests && make 
+test:
+	cd plugin/tests && make
 
 Makefile.coq: _CoqProject
 	coq_makefile -f _CoqProject -o Makefile.coq

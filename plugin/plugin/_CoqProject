@@ -139,6 +139,10 @@ extraction/pCUICWfEnvImpl.ml
 extraction/pCUICWfEnvImpl.mli
 extraction/pipeline.ml
 extraction/pipeline.mli
+extraction/primString.ml
+extraction/primString.mli
+extraction/primStringAxioms.ml
+extraction/primStringAxioms.mli
 extraction/resultMonad.ml
 extraction/resultMonad.mli
 extraction/semanticsSpec.ml
@@ -168,6 +172,7 @@ verified_extraction_ocaml.mlpack
 Loader.v
 PrimInt63.v
 PrimFloat.v
+PrimString.v
 PrimArray.v
 CoqMsgFFI.v
 OCamlFFI.v

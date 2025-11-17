@@ -23,7 +23,7 @@ Proof.
   remember (fun n (x : A) _ => f n x) as g.
   funelim (mapi_InP l n g); simpl. reflexivity.
   simp mapi_InP.
-  f_equal. 
+  f_equal.
   now rewrite (H f0).
 Qed.
 
@@ -47,7 +47,7 @@ Definition nonblocks_until i num_args :=
 
 Definition Mcase : list nat * t * list (list Ident.t * t) -> t :=
  fun '(num_args, discr, brs) =>
-   Mswitch (discr, mapi (fun i '(nms, b) => 
+   Mswitch (discr, mapi (fun i '(nms, b) =>
       (match nth_error num_args i with
       | Some 0 =>  [Malfunction.Intrange (int_of_nat (nonblocks_until i num_args), int_of_nat (nonblocks_until i num_args))]
       | _hasargs => [Malfunction.Tag (int_of_nat (blocks_until i num_args))]
@@ -82,7 +82,7 @@ Section Compile.
     let init := Mvecnew (Array, num_of_nat (List.length values), default) in
     fold_left_i (fun v idx arr => Mvecset (Array, arr, num_of_nat idx, v)) values init.
 
-  (* Definition to_primitive (compile : term -> Malfunction.t) 
+  (* Definition to_primitive (compile : term -> Malfunction.t)
     (v : EPrimitive.prim_val EAst.term) : Malfunction.t := *)
 
   Fixpoint is_wf_rec_body (t : Malfunction.t) : bool :=
@@ -96,6 +96,15 @@ Section Compile.
   Definition force_lambda (t : Malfunction.t) :=
     if is_wf_rec_body t then t
     else Mlambda (["__expanded"], Mapply_u t (Mvar "__expanded")).
+
+  Definition char63_to_byte (s : PrimString.char63) : Byte.byte :=
+    match Byte.of_nat (Uint63.to_nat s) with
+    | None => Byte.x00
+    | Some x => x
+    end.
+
+  Definition string_of_primstring (s : PrimString.string) : string :=
+    String.parse (List.map char63_to_byte (PrimStringAxioms.to_list s)).
 
   Equations? compile (t: term) : Malfunction.t
     by wf t (fun x y : EAst.term => size x < size y) :=
@@ -119,7 +128,7 @@ Section Compile.
       | tCase i mch brs =>
         match lookup_constructor_args Σ (fst i) with
         | Some num_args =>
-            Mcase (num_args, compile mch, map_InP brs (fun br H => (rev_map (fun nm => (BasicAst.string_of_name nm)) (fst br), compile (snd br))))     
+            Mcase (num_args, compile mch, map_InP brs (fun br H => (rev_map (fun nm => (BasicAst.string_of_name nm)) (fst br), compile (snd br))))
        | None => Mstring "error: inductive not found"
         end
       | tFix mfix idx =>
@@ -132,7 +141,8 @@ Section Compile.
           | None => Mstring "inductive not found" }
       | tPrim (existT (EPrimitive.primIntModel i)) => Mnum (numconst_Int i)
       | tPrim (existT (EPrimitive.primFloatModel f)) => Mnum (numconst_Float64 f)
-      | tPrim (existT (EPrimitive.primArrayModel a)) => 
+      | tPrim (existT (EPrimitive.primStringModel s)) => Mstring (string_of_primstring s)
+      | tPrim (existT (EPrimitive.primArrayModel a)) =>
           let default := compile (EPrimitive.array_default a) in
           let values := map_InP (EPrimitive.array_value a) (fun v H => compile v) in
           let arr := compile_array values default in
@@ -146,7 +156,7 @@ Section Compile.
       .
     Proof.
       all: try (cbn; lia).
-      - subst args. eapply (In_size id size) in H. cbn in *.  
+      - subst args. eapply (In_size id size) in H. cbn in *.
         unfold id in H. change (fun x => size x) with size in H. lia.
       - eapply (In_size snd size) in H. cbn in *.
         lia.
@@ -154,13 +164,13 @@ Section Compile.
       - eapply (In_size id size) in H. unfold id in *; cbn in *.
         change (fun x => size x) with size in H. lia.
     Qed.
- 
+
 End Compile.
 
-Definition compile_constant_decl Σ cb := 
+Definition compile_constant_decl Σ cb :=
   option_map (compile Σ) cb.(cst_body).
 
-Fixpoint compile_env Σ : list (string * option t) := 
+Fixpoint compile_env Σ : list (string * option t) :=
   match Σ with
   | [] => []
   | (x,d) :: Σ => match d with
