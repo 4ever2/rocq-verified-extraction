@@ -27,7 +27,7 @@ Proof.
   induction args1 in l, args2 |- *; cbn.
   - reflexivity.
   - now rewrite IHargs1.
-Qed. 
+Qed.
 
 Arguments SemanticsSpec.eval {_ _}.
 
@@ -69,7 +69,7 @@ Lemma add_to_add_multiple `{Heap} nm y nms' values' locals :
   Ident.Map.add nm y (add_multiple nms' values' locals) =
   add_multiple (nms' ++ [nm]) (values' ++ [y]) locals.
 Proof.
-  rename H into HP; rename H0 into HH. 
+  rename H into HP; rename H0 into HH.
   intros H Hlen. induction nms' in values', H, Hlen, nm, y |- *.
   - destruct values'; cbn in Hlen; try lia. reflexivity.
   - destruct values'; cbn in Hlen; try lia.
@@ -83,7 +83,7 @@ Proof.
     eapply functional_extensionality. intros x.
     unfold Ident.Map.add, Ident.eqb.
     destruct (eqb_spec x nm), (eqb_spec x a); subst; congruence.
-Qed. 
+Qed.
 
 Lemma NoDup_app {X} (l1 l2 : list X) :
   NoDup (l1 ++ l2) ->
@@ -94,7 +94,7 @@ Proof.
 Qed.
 
 Lemma eval_app_ `{Heap} globals locals args values values' nms' nms b v l h :
-  #|args| = #|nms| -> 
+  #|args| = #|nms| ->
   #|nms'| = #|values'| ->
   NoDup (nms' ++ nms) ->
   Forall2 (fun e v => eval globals locals h e h v) args values ->
@@ -102,7 +102,7 @@ Lemma eval_app_ `{Heap} globals locals args values values' nms' nms b v l h :
   eval globals locals h l h (Func_ nms (add_multiple nms' values' locals) b v) ->
   eval globals locals h (Mapply_ (l, args)) h v.
 Proof.
-  rename H into HP; rename H0 into HH. 
+  rename H into HP; rename H0 into HH.
   intros Hlen Hlenv Hdup H Heval Hl.
   eapply (eval_app_nested_ globals locals args l []). cbn.
   induction args in H, b, nms, nms', Hlen, Heval, v, values, values', Hl, l, Hdup, Hlenv |- *.
@@ -132,8 +132,8 @@ Proof.
       * lia.
 Qed.
 
-Lemma eval_apply_lambda `{Heap} globals locals args nms b values v h : 
-  #|args| = #|nms| -> 
+Lemma eval_apply_lambda `{Heap} globals locals args nms b values v h :
+  #|args| = #|nms| ->
   NoDup nms ->
   Forall2 (fun e v => eval globals locals h e h v) args values ->
   eval globals (add_multiple nms values locals) h b h v ->
@@ -156,13 +156,13 @@ Lemma eval_case_block `{Heap} globals locals discr i args brs nms br v h num_arg
   #|num_args| < Z.to_nat Int63.wB ->
   #|args| < int_to_nat PArray.max_length ->
   nth_error num_args i = Some (length nms) ->
-  nth_error brs i = Some (nms, br) -> 
+  nth_error brs i = Some (nms, br) ->
   NoDup nms ->
   #|args| = #|nms| ->
   eval globals (add_multiple nms args locals) h br h v ->
   eval globals locals h (Mcase (num_args, discr, brs)) h v.
 Proof.
-  rename H into HP; rename H0 into HH. 
+  rename H into HP; rename H0 into HH.
   intros Hdiscr Hnms Hln Hargs Hnum Hnth Hdup Hlen Hbr.
   eapply eval_switch with (e := Mapply_ (Mlambda_ (nms, br), mapi (fun i _ => Mfield (int_of_nat i, discr)) (nms))).
   - eauto.
@@ -175,7 +175,7 @@ Proof.
     change i with (0 + i) at 3.
     generalize 0 as n.
     intros n brs0 Hbrs0 Hnms Hnth Hnum Hln. induction brs as [ | [nms' br'] brs IH] in i, Hnth, Hnms, nms, br, n, brs0, Hbrs0, Hnum, Hln, num_args |- *.
-    + destruct i; cbn in *; congruence.      
+    + destruct i; cbn in *; congruence.
     + destruct num_args; cbn in *; try congruence.
       { clear Hln. now destruct i. }
       destruct i; cbn in Hnth.
@@ -190,7 +190,7 @@ Proof.
         2:{ fold find_match. specialize IH with (i := i) (n := S n) (brs0 := brs0 ++ [n0]).
             replace (n + S i) with (S n + i) by lia.
             replace ((brs0 ++ n0 :: num_args)) with ((brs0 ++ [n0]) ++ num_args).
-            etransitivity. eapply IH. 
+            etransitivity. eapply IH.
             -- rewrite app_length. cbn. lia.
             -- eauto.
             -- eauto.
@@ -205,9 +205,9 @@ Proof.
         cbn. rewrite Bool.orb_false_r. unfold blocks_until. cbn.
         rewrite firstn_app_left. 2: eauto.
         rewrite firstn_app. cbn.
-        rewrite firstn_ge. 2: lia. 
+        rewrite firstn_ge. 2: lia.
         replace (#|brs0| + S i - #|brs0|) with (S i) by lia.
-        cbn. rewrite !filter_app. cbn. rewrite app_length. 
+        cbn. rewrite !filter_app. cbn. rewrite app_length.
         intros E. eapply Uint63.eqb_correct in E.
         eapply (f_equal int_to_nat) in E.
         rewrite !int_to_of_nat in E. cbn in *. lia.
@@ -227,31 +227,31 @@ Proof.
         pose proof (filter_length brs0 (fun x : nat => match x with
         | 0%nat => false
         | S _ => true
-        end)). lia. 
+        end)). lia.
   - eapply eval_apply_lambda. 2: eassumption. 3: eassumption. 1: now rewrite mapi_length.
     revert Hargs.
     unfold mapi. change 0 with (#|@nil value|).
-    revert Hdiscr. change args with ([] ++ args) at 1 2. generalize (@nil value) as args'. 
+    revert Hdiscr. change args with ([] ++ args) at 1 2. generalize (@nil value) as args'.
     intros args' Hdiscr Hargs.
     induction args in Hargs, nms, Hlen, Hdup, Hdiscr, args' |- *.
     + destruct nms; inversion Hlen. cbn. econstructor.
     + destruct nms; inversion Hlen. cbn. econstructor.
       2: specialize IHargs with (args' := args' ++ [a]).
       2: rewrite !app_length in IHargs. 2: cbn in IHargs.
-      2: replace (S #|args'|) with (#|args'| + 1) by lia.
+      2: replace (S #|args'|) with (#|args'| + 1) by lia_max_length.
       2: eapply IHargs.
       * evar (v' : value).
         enough (a = v') as E. subst v'. rewrite E. econstructor.
         eapply Hdiscr.
         rewrite !app_length in *. lia_max_length.
         rewrite !app_length in *. rewrite int_to_of_nat; lia_max_length.
-        subst v'. rewrite int_to_of_nat.     
-        rewrite app_nth2, PeanoNat.Nat.sub_diag; [ reflexivity | lia].
-        rewrite app_length in *. lia_max_length. 
+        subst v'. rewrite int_to_of_nat.
+        rewrite app_nth2, PeanoNat.Nat.sub_diag; [ reflexivity | lia_max_length].
+        rewrite app_length in *. lia_max_length.
       * now inversion Hdup.
       * assumption.
       * rewrite <- app_assoc. eapply Hdiscr.
-      * rewrite !app_length in *. cbn in *. lia.
+      * rewrite !app_length in *. cbn in *. lia_max_length.
 Qed.
 
 Lemma Z_and_int n :
@@ -269,11 +269,11 @@ Lemma eval_case_int `{Heap} globals locals discr i brs br v h  num_args :
   eval globals locals h discr h (value_Int (Int, Z_of_nat (nonblocks_until i num_args))) ->
   #|num_args| < Z.to_nat Int63.wB ->
   nth_error num_args i = Some 0 ->
-  nth_error brs i = Some ([], br) -> 
+  nth_error brs i = Some ([], br) ->
   eval globals locals h br h v ->
   eval globals locals h (Mcase (num_args, discr, brs)) h v.
 Proof.
-  rename H into HP; rename H0 into HH. 
+  rename H into HP; rename H0 into HH.
   intros Hdiscr Hln Hnum Hnth Hbr.
   eapply eval_switch with (e := br).
   - eauto.
@@ -286,7 +286,7 @@ Proof.
     change i with (0 + i) at 3.
     generalize 0 at 1 3 4 as n.
     intros n brs0 Hbrs0 Hnth Hnum Hln. induction brs as [ | [nms' br'] brs IH] in Hln, i, Hnth, br, n, brs0, Hbrs0, Hnum, num_args |- *.
-    + destruct i; cbn in *; congruence.      
+    + destruct i; cbn in *; congruence.
     + destruct num_args; cbn in *; try congruence.
       { clear Hln. now destruct i. }
       destruct i; cbn in Hnth.
@@ -308,7 +308,7 @@ Proof.
         2:{ fold find_match. specialize IH with (i := i) (n := S n) (brs0 := brs0 ++ [n0]).
             replace (n + S i) with (S n + i) by lia.
             replace ((brs0 ++ n0 :: num_args)) with ((brs0 ++ [n0]) ++ num_args).
-            etransitivity. eapply IH. 
+            etransitivity. eapply IH.
             -- rewrite app_length. cbn. lia.
             -- eauto.
             -- eauto.
@@ -324,7 +324,7 @@ Proof.
         revert H0. unfold nonblocks_until.
         setoid_rewrite firstn_app_left at 2. 2: eauto.
         rewrite firstn_app. cbn [app firstn].
-        rewrite firstn_ge. 2: lia. 
+        rewrite firstn_ge. 2: lia.
         replace (#|brs0| + S i - #|brs0|) with (S i) by lia.
         cbn [app filter firstn]. rewrite !filter_app. cbn [firstn app]. rewrite app_length.
         cbn [filter length].

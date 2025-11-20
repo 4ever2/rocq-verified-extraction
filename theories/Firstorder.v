@@ -1031,7 +1031,7 @@ Proof.
     clearbody X. intros Ts Hrel. rewrite <- (app_nil_r lind). revert HX Ts Hrel. generalize (@nil nat) as lind_done.
     revert X lind x.
     induction cstr_args0; intros X lind x lind_done HX Ts Hrel; simpl in *; eauto.
-    1: { eapply All2_length in Hrel. apply length_nil in Hrel.
+    1: { eapply All2_length in Hrel. apply MCList.length_nil in Hrel.
          now subst. }
     unfold Ts in Hrel. edestruct (CoqType_to_camlType_ind_ctor_app (Σb := [])) as [? [? ->]] in Hrel.
     apply All2_app_inv_r in Hrel as [lind' [lind'' [? [Hrel Ha]]]]. subst.
@@ -1052,7 +1052,7 @@ Proof.
       unfold t. cbn in Ha. destruct andb_and. destruct (a _). clear a i i1.
       destruct decl_type; inversion i0.
       * cbn. revert i0 Ha. rewrite rev_length. cbn.  intros. apply andb_and in i0. destruct i0. rewrite <- plus_n_O in H.
-        inversion Ha. subst. apply All2_length in X0. apply length_nil in X0. subst. clear Ha.
+        inversion Ha. subst. apply All2_length in X0. apply MCList.length_nil in X0. subst. clear Ha.
         rewrite H. rewrite nth_error_inds. { apply leb_complete in H1. lia. }
         cbn. repeat f_equal; eauto. destruct H4 as [? [? ?]]. inversion H4.
         apply leb_complete in H1. lia.
@@ -1212,7 +1212,7 @@ Proof.
           clear Ha''. apply f_equal with (f := @List.length _) in H2.
           rewrite CoqType_to_camlType_ind_ctors_length in H2.
           cbn in H2. erewrite rev_length, app_length in H2.
-          assert (Ha0 : #|cstr_args a0| = 0) by lia. apply length_nil in Ha0.
+          assert (Ha0 : #|cstr_args a0| = 0) by lia. apply MCList.length_nil in Ha0.
           rewrite e0 in H0. inversion H0. subst; clear H0.
           destruct wfΣ as [wfΣ _]. inversion wfΣ as [_ wfΣ'].
           cbn in wfΣ'. inversion wfΣ'; subst. clear X.
@@ -1226,7 +1226,7 @@ Proof.
           unfold cstr_concl in Htyp.
           erewrite Hparam, Ha0 in Htyp. cbn in Htyp.
           assert (cstr_indices a0 = []).
-          { apply length_nil. erewrite @cstr_indices_length with (Σ:=Σ) (ind:=(mkInd kn ind,k')); eauto.
+          { apply MCList.length_nil. erewrite @cstr_indices_length with (Σ:=Σ) (ind:=(mkInd kn ind,k')); eauto.
             2: { repeat split. cbn. left. reflexivity. all:cbn; eauto. } cbn. eapply nth_error_forall in Hindices; eauto.
                  cbn in Hindices. now rewrite Hindices. }
           rewrite H0 in Htyp; clear H0; cbn in Htyp.
@@ -1395,7 +1395,7 @@ Proof.
           rewrite rev_length. epose (context_assumptions_length_bound (cstr_args decl)). lia.
         }
         assert (Hcstr_indices : cstr_indices decl = []).
-        { apply length_nil. erewrite @cstr_indices_length with (Σ:=Σ) (ind:=(mkInd kn ind,k')); eauto.
+        { apply MCList.length_nil. erewrite @cstr_indices_length with (Σ:=Σ) (ind:=(mkInd kn ind,k')); eauto.
           cbn. eapply nth_error_forall in Hindices; eauto.
                cbn in Hindices. now rewrite Hindices. }
         exists t; exists expt.
