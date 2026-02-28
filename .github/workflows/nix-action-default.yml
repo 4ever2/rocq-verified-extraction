@@ -1,7 +1,8 @@
 jobs:
-  ceres:
+  ceres-bs:
     needs:
     - coq
+    - metarocq
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -38,9 +39,9 @@ jobs:
         extraPullNames: coq, coq-community, math-comp
         name: metarocq
     - id: stepGetDerivation
-      name: Getting derivation for current job (ceres)
+      name: Getting derivation for current job (ceres-bs)
       run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
-        \"default\" --argstr job \"ceres\" \\\n   --dry-run 2> err > out || (touch
+        \"default\" --argstr job \"ceres-bs\" \\\n   --dry-run 2> err > out || (touch
         fail; true)\n"
     - name: Error reporting
       run: "echo \"out=\"; cat out\necho \"err=\"; cat err\n"
@@ -58,9 +59,13 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "default"
         --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: metarocq'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "default"
+        --argstr job "metarocq"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "default"
-        --argstr job "ceres"
+        --argstr job "ceres-bs"
   coq:
     needs: []
     runs-on: ubuntu-latest
@@ -244,7 +249,7 @@ jobs:
     - coq
     - equations
     - metarocq
-    - ceres
+    - ceres-bs
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -305,9 +310,9 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "default"
         --argstr job "metarocq"
     - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: ceres'
+      name: 'Building/fetching previous CI target: ceres-bs'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "default"
-        --argstr job "ceres"
+        --argstr job "ceres-bs"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "default"

@@ -33,7 +33,7 @@ with (import <nixpkgs> {}).lib;
   ##     should be preferred then.
   buildInputs = [ "equations" "metarocq" ];
   nativeBuildInputs = [ "equations" ];
-    
+
   ## Indicate the relative location of your _CoqProject
   ## If not specified, it defaults to "_CoqProject"
   # coqproject = "_CoqProject";
@@ -55,9 +55,9 @@ with (import <nixpkgs> {}).lib;
     ## through the following attribute
     coqPackages.coq.override.version = "9.0";
     coqPackages.equations.override.version = "1.3.1-9.0";
-    
+
     coqPackages.metarocq.override.version = "1.4-9.0";
-    coqPackages.ceres.override.version = "0.4.1";
+    coqPackages.ceres-bs.override.version = "master";
 
     ## In some cases, light overrides are not available/enough
     ## in which case you can use either
@@ -104,17 +104,17 @@ with (import <nixpkgs> {}).lib;
   cachix.coq = {};
   cachix.math-comp = {};
   cachix.coq-community = {};
-  
+
   ## If you have write access to one of these caches you can
   ## provide the auth token or signing key through a secret
   ## variable on GitHub. Then, you should give the variable
   ## name here. For instance, coq-community projects can use
   ## the following line instead of the one above:
   cachix.metarocq.authToken = "CACHIX_AUTH_TOKEN";
-  
+
   ## Or if you have a signing key for a given Cachix cache:
   # cachix.my-cache.signingKey = "CACHIX_SIGNING_KEY"
-  
+
   ## Note that here, CACHIX_AUTH_TOKEN and CACHIX_SIGNING_KEY
   ## are the names of secret variables. They are set in
   ## GitHub's web interface.
